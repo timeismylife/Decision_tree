@@ -6,6 +6,8 @@ Created on Mon Oct 29 20:58:19 2018
 """
 import numpy as np
 import operator
+#from treePloter import retrieveTree
+from treePloter import createPlot
 def createDataSet():
     dataSet = [[1, 1, 'yes'],
                [1, 1, 'yes'],
@@ -83,14 +85,45 @@ def createTree(dataSet, labels):
               subLabels)
     return myTree
     
-         
+def classify(inputTree, featLabels, testVec):
+    firstStr = list(inputTree)[0]
+    secondDict = inputTree[firstStr]
+    featIndex = featLabels.index(firstStr)
+    for key in secondDict.keys():
+        if testVec[featIndex] == key:
+            if type(secondDict[key]).__name__ == 'dict':
+                classlabel = classify(secondDict[key], featLabels, testVec)
+            else:
+                classlabel = secondDict[key]
+    return classlabel
+
+def storeTree(inputTree, filename):
+    import pickle
+    fw = open(filename, 'wb')
+    pickle.dump(inputTree, fw)
+    fw.close()
+
+def grabTree(filename):
+    import pickle
+    fr = open(filename, 'rb')
+    return pickle.load(fr)
+            
     
 
 dataSet, labels = createDataSet()
-shannonEnt = calcShannonEnt(dataSet)
-splitDataSet(dataSet, 0, 1)
-feat = chooseBestFeaturetoSplit(dataSet)
-myTree = createTree(dataSet, labels)
+#shannonEnt = calcShannonEnt(dataSet)
+#splitDataSet(dataSet, 0, 1)
+#feat = chooseBestFeaturetoSplit(dataSet)
+#myTree = createTree(dataSet, labels)
+#myTree = retrieveTree(0)
+#classlabel = classify(myTree, labels, [1,0])
+#storeTree(myTree, 'classifierStorge.txt')
+#text = grabTree('classifierStorge.txt')
+fr = open('lenses.txt')
+lenses = [inst.strip().split('\t') for inst in fr.readlines()]
+lensesLabels = ['age', 'prescript', 'astigmatic', 'tearRate']
+lensesTree = createTree(lenses, lensesLabels)
+createPlot(lensesTree)
 
 
         
